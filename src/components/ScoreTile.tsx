@@ -1,14 +1,15 @@
-import { CONFIDENCE_LABEL, SCORE_LABEL, type Score, type ScoreKind } from '../types/score'
+import type { DisplayScore } from '../services/shopQuery'
+import { CONFIDENCE_LABEL, SCORE_LABEL, type ScoreKind } from '../types/score'
 
 type Props = {
   kind: ScoreKind
-  score: Score
+  score: DisplayScore
   size?: 'md' | 'lg'
 }
 
 /**
  * 評価1つ分のタイル。
- * 点数がある時だけ数字を出し、未評価・保留は「—」。0点で埋めない。
+ * 点数がある時だけ数字を出し、未評価・保留・低信頼で非表示は「—」。0点で埋めない。
  */
 export function ScoreTile({ kind, score, size = 'md' }: Props) {
   const label = SCORE_LABEL[kind]
@@ -25,6 +26,8 @@ export function ScoreTile({ kind, score, size = 'md' }: Props) {
         return '未評価'
       case 'on_hold':
         return '評価保留'
+      case 'hidden_low_confidence':
+        return '低信頼・非表示'
     }
   })()
 
@@ -47,10 +50,8 @@ export function ScoreTile({ kind, score, size = 'md' }: Props) {
       </div>
       <div
         className={[
-          'mt-1.5 text-xs',
-          score.status === 'provisional'
-            ? 'rounded bg-warn/15 px-1.5 font-bold text-warn'
-            : 'text-text-muted',
+          'mt-1.5 text-xs whitespace-nowrap',
+          score.status === 'provisional' ? 'rounded bg-warn/15 px-1.5 font-bold text-warn' : 'text-text-muted',
         ].join(' ')}
       >
         {status}

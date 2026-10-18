@@ -1,6 +1,6 @@
 # アーキテクチャ
 
-## 現在（Phase 1）
+## 現在（Phase 2）
 
 ```
 ブラウザ ──(静的ファイル)── GitHub Pages
@@ -8,7 +8,19 @@
      GitHub Actions が main から build して公開
 ```
 
-サーバーもデータベースもまだありません。店舗データは `src/fixtures/sampleShops.ts` の架空データを `services/shopRepository.ts` 経由で表示しています。
+サーバーはありません。店舗データは `src/fixtures/sampleShops.ts` の架空データを `services/shopRepository.ts` 経由で表示しています。
+設定・お気に入り・検索履歴・プリセットはブラウザ内の IndexedDB（`services/storage/`）に保存します。
+
+### 状態の置き場所
+| 種類 | 置き場所 | 例 |
+| --- | --- | --- |
+| 基本設定（永続） | IndexedDB `user_preferences` | 基本地域、距離上限、低信頼を隠す |
+| お気に入り・履歴・プリセット | IndexedDB 各ストア | — |
+| 一時的な検索条件 | URL（`#/shops?sort=hyena&area=13`） | キーワード、並び順、範囲 → 共有可能 |
+| 一時検索地点（GPS） | メモリのみ | 再起動で解除 |
+
+### 検索の流れ
+`ShopListPage` → `useShopSearch`（URL ⇄ 条件）→ `runShopQuery`（純粋関数：絞り込み・距離・並び替え・低信頼の非表示）→ `ShopCard` / `ShopMap`
 
 ## 目標の層構成（仕様 2章）
 
@@ -37,11 +49,14 @@ src/
   pages/         画面単位
   hooks/         画面用の状態（お気に入り等）
   types/         ドメイン型（店舗・評価）
-  lib/           表示用の小さな関数（日付整形等）
+  lib/           小さな関数（日付整形・距離計算・Googleマップ URL）
+  data/          47都道府県
   services/
     scoring/                         … Phase 5
     shopRepository.ts  店舗データの取得窓口（現在は架空データ）
-    repositories/                    … Phase 2〜（IndexedDB）
+    shopQuery.ts       検索・並び替え（純粋関数）
+    queryParams.ts     検索条件 ⇄ URL
+    storage/           IndexedDB（設定・お気に入り・履歴・プリセット）
     adapters/                        … Phase 4
     sync/                            … Phase 7
   fixtures/      架空サンプルデータ（必ず isSample: true）

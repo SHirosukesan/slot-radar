@@ -3,16 +3,22 @@ import { ComingSoon } from '../components/ComingSoon'
 import { FavoriteButton } from '../components/FavoriteButton'
 import { PageHeader } from '../components/PageHeader'
 import { SampleBadge, SampleDataBanner } from '../components/SampleDataBanner'
+import { RouteButton } from '../components/RouteButton'
 import { ScoreTile } from '../components/ScoreTile'
+import { useAppData, useOrigin } from '../hooks/useAppData'
 import { formatPeriod, formatUpdatedAt } from '../lib/format'
+import { distanceKm, formatDistance } from '../lib/geo'
 import { getShop } from '../services/shopRepository'
-import { CONFIDENCE_LABEL, SCORE_KINDS, SCORE_LABEL, type Score } from '../types/score'
+import { toDisplayScore, type DisplayScore } from '../services/shopQuery'
+import { CONFIDENCE_LABEL, SCORE_KINDS, SCORE_LABEL } from '../types/score'
 
 const STATUS_LABEL = { open: '営業中', closed: '閉店', unknown: '営業状態 不明' } as const
 
 export function ShopDetailPage() {
   const { shopId = '' } = useParams()
   const shop = getShop(shopId)
+  const { prefs } = useAppData()
+  const origin = useOrigin()
 
   if (!shop) {
     return (
@@ -45,11 +51,15 @@ export function ShopDetailPage() {
         <p className="mt-1 text-sm text-text-muted">{shop.address}</p>
         <p className="tabular mt-1 text-xs text-text-muted">
           {STATUS_LABEL[shop.status]}・評価更新 {formatUpdatedAt(shop.updatedAt)}
+          {origin && shop.location && `・${origin.label}から直線 ${formatDistance(distanceKm(origin.point, shop.location))}`}
         </p>
+        <div className="mt-3">
+          <RouteButton shop={shop} variant="wide" />
+        </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           {SCORE_KINDS.map((kind) => (
-            <ScoreTile key={kind} kind={kind} score={shop.scores[kind]} size="lg" />
+            <ScoreTile key={kind} kind={kind} score={toDisplayScore(shop.scores[kind], prefs.hideLowConfidence)} size="lg" />
           ))}
         </div>
       </section>
@@ -63,7 +73,7 @@ export function ShopDetailPage() {
             <div key={kind} className="px-4 py-3">
               <dt className="text-sm font-bold">{SCORE_LABEL[kind]}</dt>
               <dd className="mt-1 text-sm text-text-muted">
-                <BasisText score={shop.scores[kind]} />
+                <BasisText score={toDisplayScore(shop.scores[kind], prefs.hideLowConfidence)} />
               </dd>
             </div>
           ))}
@@ -75,13 +85,14 @@ export function ShopDetailPage() {
         title="イベント実績・機種別・現場感覚"
         items={['イベント別実績ランキング', '30日 / 90日 / 1年 の比較', '店舗ごとの現場感覚（客数・専業割合など）']}
       />
-      <ComingSoon phase={2} title="地図・経路" items={['Googleマップで位置確認・経路案内']} />
     </>
   )
 }
 
-function BasisText({ score }: { score: Score }) {
+function BasisText({ score }: { score: DisplayScore }) {
   switch (score.status) {
+    case 'hidden_low_confidence':
+      return <>信頼度「低」のため非表示（「店舗検索 → その他の条件」で表示に切替できます）</>
     case 'unrated':
       return <>根拠データなし（未評価）</>
     case 'on_hold':

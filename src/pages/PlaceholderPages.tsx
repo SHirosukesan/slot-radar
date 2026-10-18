@@ -2,8 +2,11 @@ import { Link } from 'react-router'
 import { ComingSoon } from '../components/ComingSoon'
 import { PageHeader } from '../components/PageHeader'
 import { ShopCard } from '../components/ShopCard'
-import { useFavorites } from '../hooks/useFavorites'
+import { useMemo } from 'react'
+import { useAppData, useOrigin } from '../hooks/useAppData'
 import { listShops } from '../services/shopRepository'
+import { runShopQuery } from '../services/shopQuery'
+import { DEFAULT_QUERY } from '../types/query'
 
 export function RecordsPage() {
   return (
@@ -32,14 +35,28 @@ export function BalancePage() {
 }
 
 export function FavoritesPage() {
-  const { favoriteIds } = useFavorites()
-  const shops = listShops().filter((s) => favoriteIds.has(s.id))
+  const { favorites, prefs } = useAppData()
+  const origin = useOrigin()
+  // お気に入りは地域・距離に関係なく全件表示（見逃し防止）
+  const shops = useMemo(
+    () =>
+      runShopQuery(
+        listShops(),
+        { ...DEFAULT_QUERY, area: { kind: 'all' }, favoritesOnly: true, maxDistanceKm: null },
+        {
+          favorites,
+          basePrefectureCode: prefs.basePrefectureCode,
+          origin: origin?.point ?? null,
+          maxDistanceKm: null,
+          hideLowConfidence: prefs.hideLowConfidence,
+        },
+      ).results,
+    [favorites, prefs.basePrefectureCode, prefs.hideLowConfidence, origin],
+  )
   return (
     <>
       <PageHeader title="お気に入り" />
-      <p className="mx-4 mt-3 text-xs text-text-muted">
-        Phase 1 では再読み込みすると星が消えます（端末への保存は Phase 2）。
-      </p>
+      <p className="mx-4 mt-3 text-xs text-text-muted">この端末に保存されます。地域・距離の条件に関係なく全件表示します。</p>
       {shops.length === 0 ? (
         <div className="mx-4 mt-6 rounded-2xl border border-border bg-surface p-5 text-center">
           <p className="text-text-muted">お気に入りの店舗はまだありません</p>
@@ -49,9 +66,9 @@ export function FavoritesPage() {
         </div>
       ) : (
         <ul className="space-y-3 px-4 pt-3" aria-label="お気に入り店舗">
-          {shops.map((shop) => (
-            <li key={shop.id}>
-              <ShopCard shop={shop} />
+          {shops.map((r) => (
+            <li key={r.shop.id}>
+              <ShopCard result={r} />
             </li>
           ))}
         </ul>
