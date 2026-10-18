@@ -1,6 +1,6 @@
 # アーキテクチャ
 
-## 現在（Phase 0）
+## 現在（Phase 1）
 
 ```
 ブラウザ ──(静的ファイル)── GitHub Pages
@@ -8,7 +8,7 @@
      GitHub Actions が main から build して公開
 ```
 
-サーバーもデータベースもまだありません。
+サーバーもデータベースもまだありません。店舗データは `src/fixtures/sampleShops.ts` の架空データを `services/shopRepository.ts` 経由で表示しています。
 
 ## 目標の層構成（仕様 2章）
 
@@ -34,16 +34,19 @@ pages / components   … 画面（表示だけ）
 src/
   config/        アプリ設定（現在の Phase など）
   components/    共通 UI 部品
-  pages/         画面単位            … Phase 1〜
-  hooks/                             … Phase 1〜
-  types/         ドメイン型          … Phase 1〜
+  pages/         画面単位
+  hooks/         画面用の状態（お気に入り等）
+  types/         ドメイン型（店舗・評価）
+  lib/           表示用の小さな関数（日付整形等）
   services/
     scoring/                         … Phase 5
+    shopRepository.ts  店舗データの取得窓口（現在は架空データ）
     repositories/                    … Phase 2〜（IndexedDB）
     adapters/                        … Phase 4
     sync/                            … Phase 7
-  fixtures/      架空サンプルデータ（必ず is_sample: true）… Phase 1
+  fixtures/      架空サンプルデータ（必ず isSample: true）
   test/          テスト共通設定
+e2e/             Playwright の E2E テスト
 ```
 
 ## 保存・同期（予定）
