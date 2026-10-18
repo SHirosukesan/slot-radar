@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+
+/*
+ * SLOT RADAR デザイントークン（Phase 0 の最小セット）
+ * 方針: 黒に近い背景 + 紫アクセント。可読性・コントラスト最優先。
+ * 文字色はすべて背景 #0b0a10 に対して WCAG AA (4.5:1) 以上。
+ *   text        #f4f2fa  … 約 18:1
+ *   text-muted  #b9b4c9  … 約 9.6:1
+ *   accent      #a78bfa  … 約 7.4:1（文字にも使える紫）
+ */
+@theme {
+  --color-bg: #0b0a10;
+  --color-surface: #16141f;
+  --color-surface-2: #201d2c;
+  --color-border: #2e2a3d;
+  --color-text: #f4f2fa;
+  --color-text-muted: #b9b4c9;
+  --color-accent: #a78bfa;
+  --color-accent-strong: #7c3aed;
+  --color-accent-soft: #2a2140;
+  --color-warn: #fbbf24;
+
+  --font-sans:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI',
+    system-ui, sans-serif;
+  --font-num: ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* 数値は桁を揃える（仕様 3章） */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes radar-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radar-sweep {
+    animation: none !important;
+  }
+}
