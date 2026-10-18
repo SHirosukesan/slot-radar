@@ -13,7 +13,7 @@ test('各画面で横にはみ出さず、コンソールエラーが出ない',
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
   page.on('pageerror', (e) => errors.push(e.message))
 
-  for (const path of ['/', '/shops', '/shops/sample-003', '/records', '/balance', '/favorites', '/nope']) {
+  for (const path of ['/', '/shops', '/shops?view=map', '/shops/sample-003', '/records', '/balance', '/favorites', '/settings', '/nope']) {
     await page.goto(`/#${path}`)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expectNoHorizontalOverflow(page)

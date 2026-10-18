@@ -1,15 +1,16 @@
 import { HashRouter, Route, Routes } from 'react-router'
 import { AppShell } from './components/AppShell'
-import { FavoritesProvider } from './hooks/useFavorites'
+import { AppDataProvider } from './hooks/useAppData'
 import { HomePage } from './pages/HomePage'
 import { BalancePage, FavoritesPage, NotFoundPage, RecordsPage } from './pages/PlaceholderPages'
+import { SettingsPage } from './pages/SettingsPage'
 import { ShopDetailPage } from './pages/ShopDetailPage'
 import { ShopListPage } from './pages/ShopListPage'
 
 /** 画面とURLの対応表。テストからも使えるようルーターとは分けている */
 export function AppRoutes() {
   return (
-    <FavoritesProvider>
+    <AppDataProvider>
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<HomePage />} />
@@ -18,10 +19,11 @@ export function AppRoutes() {
           <Route path="records" element={<RecordsPage />} />
           <Route path="balance" element={<BalancePage />} />
           <Route path="favorites" element={<FavoritesPage />} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
-    </FavoritesProvider>
+    </AppDataProvider>
   )
 }
 

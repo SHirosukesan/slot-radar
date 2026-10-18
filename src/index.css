@@ -61,3 +61,24 @@
     animation: none !important;
   }
 }
+
+/* ---- 地図（Leaflet）を暗い配色に合わせる ---- */
+.shop-map.leaflet-container {
+  background: var(--color-surface);
+  font-family: var(--font-sans);
+}
+.shop-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(200deg) saturate(0.35) brightness(0.85) contrast(0.95);
+}
+.shop-map .leaflet-popup-content {
+  font-size: 15px;
+  margin: 12px 14px;
+}
+.shop-map .shop-map-link {
+  color: #4c1d95;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.shop-map .leaflet-control-attribution {
+  font-size: 11px;
+}

@@ -26,6 +26,10 @@ describe('架空サンプルデータ', () => {
     }
   })
 
+  it('架空店舗の座標は未確認扱い（経路を出さない）', () => {
+    for (const shop of SAMPLE_SHOPS) expect(shop.location?.verified ?? false).toBe(false)
+  })
+
   it('表示確認用に、未評価・暫定・保留・長い店名を含む', () => {
     const statuses = SAMPLE_SHOPS.flatMap((s) => Object.values(s.scores).map((v) => v.status))
     expect(statuses).toEqual(expect.arrayContaining(['rated', 'provisional', 'unrated', 'on_hold']))

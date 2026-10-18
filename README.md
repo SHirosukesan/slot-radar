@@ -2,18 +2,17 @@
 
 全国のパチスロ店舗・イベントを探し、**信頼できる過去実績**と**個人の現場感覚**を区別して比較し、Googleマップで移動し、実戦・給与・親の損益も記録できる、スマホ優先の Web アプリ（PWA）です。
 
-> **現在の状態: Phase 1（UI設計と店舗一覧・架空データ）**
-> 下部ナビ・店舗一覧・店舗詳細が動きます。表示される店舗・点数はすべて**架空**です。イベント・記録・地図は未実装です。
+> **現在の状態: Phase 2（地域・検索・お気に入り・地図）**
+> 地域設定・並び替え・絞り込み・お気に入り保存・地図・GPS 候補が動きます。表示される店舗・点数はすべて**架空**です。イベント・実戦記録は未実装です。
 > 仕様の基準は [`docs/product-spec.md`](docs/product-spec.md) です。
 
 ## 画面を見る方法
 
-### A. 公開URL（GitHub Pages を有効にした後）
+### A. 公開URL
 
 `main` にマージされると GitHub Actions が自動で公開します。
 
 - URL: `https://shirosukesan.github.io/slot-radar/`
-- 初回だけ GitHub の **Settings → Pages → Build and deployment → Source** を **「GitHub Actions」** にする必要があります。
 
 ### B. 自分のPCで動かす
 
@@ -45,6 +44,8 @@ npm run dev     # 開発用サーバーを起動
 - **React + TypeScript + Vite** … 画面部品・型付き JavaScript・高速な開発サーバー
 - **Tailwind CSS v4** … デザイントークン（色や文字の決まり事）を `src/index.css` に集約
 - **React Router** … 画面切替（`#/shops` のようなハッシュ方式）
+- **IndexedDB（idb）** … 設定・お気に入りを端末のブラウザ内に保存（サーバーには送らない）
+- **Leaflet + OpenStreetMap** … 無料の地図表示。経路は Google マップの URL で開く
 - **Vitest + Testing Library** … 自動テスト
 - **Playwright** … スマホ幅（390px / 320px）の実ブラウザテスト
 - **GitHub Actions** … PR ごとに lint / 型 / テスト / ビルドを自動実行（`.github/workflows/ci.yml`）
